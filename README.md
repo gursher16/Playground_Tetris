@@ -14,11 +14,11 @@ java -cp [folderLocaton] com.playground.tetris.Tetris
 ```
 
 ### Controls
-&larr; = move piece left  
-&rarr; = move piece right  
-&darr; = move piece down  
-&uarr; = rotate piece  
-Esc; = exit  
+**&larr;** = move piece left  
+**&rarr;** = move piece right  
+**&darr;** = move piece down  
+**&uarr;** = rotate piece  
+**Esc** = exit  
 
 ### Note
 In order to bypass Java console IO limitations, an empty JFrame is used to capture user input
