@@ -10,8 +10,8 @@ import java.util.Random;
  */
 public class Assets {
 
-	public int boardWidth = 12;
-	public int boardHeight = 14;
+	public int boardWidth = 16;
+	public int boardHeight = 18;
 	// internal reprentation of the playing board
 	public int[] board;
 
