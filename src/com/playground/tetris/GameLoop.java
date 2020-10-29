@@ -2,70 +2,89 @@ package com.playground.tetris;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.playground.tetris.Assets.Tetromino;
 
+/**
+ * Class containing core game loop and functionality
+ * 
+ * @author Gursher
+ *
+ */
 public class GameLoop implements KeyListener {
 
-	boolean isGameOver;
 	Assets assets;
 	// the current piece
 	Tetromino currentPiece;
+	// tracks the game state
+	boolean isGameOver;
 	// rotation of the current piece
 	int currentRotation;
 	// X coordinate of current piece
 	int currentX;
 	// Y coordinate of current piece
 	int currentY;
-	// Console object for the game
-	Console c;
-
-	int speed;
-	int speedCounter;
-	int speedMultiplier;
+	// base speed of the game - increment to increase difficulty
+	float speed;
+	// used to control the timing
+	float speedCounter;
+	// used to control the speed of descent of pieces
+	float speedMultiplier;
+	// flag to move tetromino downwards
 	boolean forcePieceDown;
-
+	// list of horizontal lines formed by adjacent pieces
 	List<Integer> horizontalLines;
-	// required for debug
+	// tracks the game score
+	int score;
 
-	//
-	public GameLoop(Assets assets) {
+	public GameLoop(Assets assets, int difficulty) {
 		isGameOver = false;
 		this.assets = assets;
 		currentPiece = Tetromino.ONE;
 		currentRotation = 0;
 		currentY = 0;
 		currentX = assets.boardWidth / 2;
-		c = System.console();
-		speed = 20;
-		speedCounter = 0;
-		speedMultiplier = 1;
+
+		switch (difficulty) {
+		case 1:
+			speed = 60f;
+			break;
+		case 2:
+			speed = 40f;
+			break;
+		case 3:
+			speed = 20f;
+			break;
+		}
+
+		speedCounter = 0f;
+		speedMultiplier = 1f;
 		forcePieceDown = false;
 		horizontalLines = new ArrayList<>();
+		score = 0;
 	}
 
+	/**
+	 * Main game loop -- Starts the game
+	 * 
+	 * @throws InterruptedException
+	 */
 	public void startGame() throws InterruptedException {
 
-		// MAIN GAME TIMING
 		while (!isGameOver) {
 
 			clearConsole();
 			speedCounter += speedMultiplier;
 			forcePieceDown = (speedCounter >= speed);
+
 			// place current piece on board
 			placePieceOnBoard(currentPiece, currentRotation, currentX, currentY);
 			// render board with current piece
 			renderBoard();
 			// remove any full horizontal lines created by pieces
 			removeHorizontalLine();
-			System.out.println();
-			System.out.println();
-			renderBoardDebug();
-
-			renderDebugInfo(currentX, currentY);
 			// check if piece can move downwards
 			if (forcePieceDown) {
 				if (doesPieceFit(currentPiece, currentRotation, currentX, currentY + 1)) {
@@ -83,14 +102,8 @@ public class GameLoop implements KeyListener {
 				speedCounter = 0;
 			}
 		}
-	}
 
-	private void renderDebugInfo(int currentX, int currentY) {
-		System.out.println();
-		System.out.println();
-		System.out.println("CurrentX: " + currentX);
-		System.out.println("CurrentY: " + currentY);
-
+		System.out.println("\n\n===GAME OVER!!===");
 	}
 
 	/**
@@ -101,8 +114,10 @@ public class GameLoop implements KeyListener {
 		currentY = 0;
 		currentRotation = 0;
 		currentPiece = Tetromino.values()[(int) (Math.random() * Tetromino.values().length)];
-		speedMultiplier += 1;
+		speedMultiplier += 0.5;
 	}
+
+	// ===================RENDER BOARD=============================//
 
 	/**
 	 * Clears the console
@@ -130,15 +145,15 @@ public class GameLoop implements KeyListener {
 	public void renderBoard() throws InterruptedException {
 		for (int y = 0; y < assets.boardHeight; y++) {
 			for (int x = 0; x < assets.boardWidth; x++) {
-				if (assets.board[x * assets.boardHeight + y] == 1) {
+				if (assets.board[y * assets.boardWidth + x] == 1) {
 					System.out.print("#");
-				} else if (assets.board[x * assets.boardHeight + y] == 2) {
+				} else if (assets.board[y * assets.boardWidth + x] == 2) {
 					System.out.print("@");
 					// set pos back to zero
-					assets.board[x * assets.boardHeight + y] = 0;
-				} else if (assets.board[x * assets.boardHeight + y] == 3) {
+					assets.board[y * assets.boardWidth + x] = 0;
+				} else if (assets.board[y * assets.boardWidth + x] == 3) {
 					System.out.print("@");
-				} else if (assets.board[x * assets.boardHeight + y] == 4) {
+				} else if (assets.board[y * assets.boardWidth + x] == 4) {
 					System.out.print("=");
 				} else {
 					System.out.print(" ");
@@ -146,6 +161,7 @@ public class GameLoop implements KeyListener {
 			}
 			System.out.println();
 		}
+		System.out.println("===SCORE: " + score + "===");
 	}
 
 	/**
@@ -156,15 +172,15 @@ public class GameLoop implements KeyListener {
 		System.out.println("==============DEBUG=======");
 		for (int y = 0; y < assets.boardHeight; y++) {
 			for (int x = 0; x < assets.boardWidth; x++) {
-				if (assets.board[x * assets.boardHeight + y] == 1) {
+				if (assets.board[y * assets.boardWidth + x] == 1) {
 					System.out.print("1");
-				} else if (assets.board[x * assets.boardHeight + y] == 2) {
+				} else if (assets.board[y * assets.boardWidth + x] == 2) {
 					System.out.print("2");
 					// set pos back to zero
-					assets.board[x * assets.boardHeight + y] = 0;
-				} else if (assets.board[x * assets.boardHeight + y] == 3) {
+					assets.board[y * assets.boardWidth + x] = 0;
+				} else if (assets.board[y * assets.boardWidth + x] == 3) {
 					System.out.print("3");
-				} else if (assets.board[x * assets.boardHeight + y] == 4) {
+				} else if (assets.board[y * assets.boardWidth + x] == 4) {
 					System.out.print("4");
 				} else {
 					System.out.print("0");
@@ -173,6 +189,18 @@ public class GameLoop implements KeyListener {
 			System.out.println();
 		}
 	}
+
+	private void renderDebugInfo(int currentX, int currentY) {
+		System.out.println();
+		System.out.println();
+		System.out.println("CurrentX: " + currentX);
+		System.out.println("CurrentY: " + currentY);
+		if (!horizontalLines.isEmpty()) {
+			System.out.println("Lines value: " + horizontalLines.get(0));
+		}
+	}
+
+	// ===================GAME LOGIC===============================//
 
 	/**
 	 * Places a tetromino on the on the board
@@ -186,7 +214,7 @@ public class GameLoop implements KeyListener {
 		for (int pY = 0; pY < 4; pY++) {
 			for (int pX = 0; pX < 4; pX++) {
 				if (tPiece.piece.charAt(tPiece.rotate(pX, pY, currentRotation)) == 'X') {
-					assets.board[((currentX + pX) * assets.boardHeight) + currentY + pY] = 2;
+					assets.board[((currentY + pY) * assets.boardWidth) + currentX + pX] = 2;
 				}
 			}
 		}
@@ -204,10 +232,12 @@ public class GameLoop implements KeyListener {
 		for (int pY = 0; pY < 4; pY++) {
 			for (int pX = 0; pX < 4; pX++) {
 				if (tPiece.piece.charAt(tPiece.rotate(pX, pY, currentRotation)) == 'X') {
-					assets.board[((currentX + pX) * assets.boardHeight) + currentY + pY] = 3;
+					assets.board[((currentY + pY) * assets.boardWidth) + currentX + pX] = 3;
 				}
 			}
 		}
+		// increment score by 25 per piece locked in
+		score += 25;
 	}
 
 	/**
@@ -228,7 +258,7 @@ public class GameLoop implements KeyListener {
 				int pI = tPiece.rotate(pX, pY, rotation);
 
 				// get board index of piece
-				int bI = ((currentX + pX) * assets.boardHeight) + (currentY + pY);
+				int bI = ((currentY + pY) * assets.boardWidth) + (currentX + pX);
 
 				// collision detection
 				if ((currentX + pX >= 0) && (currentX + pX < assets.boardWidth)) {
@@ -259,16 +289,16 @@ public class GameLoop implements KeyListener {
 				boolean isLine = true;
 				for (int pX = 1; pX < assets.boardWidth - 1; pX++) {
 					// if any blank spaces are present - then isLine = false
-					if (assets.board[(pX * assets.boardHeight) + (currentY + pY)] == 0) {
+					if (assets.board[((pY + currentY) * assets.boardWidth) + pX] == 0) {
 						isLine = false;
 					}
 				}
 				if (isLine) {
 					for (int pX = 1; pX < assets.boardWidth - 1; pX++) {
-						assets.board[(pX * assets.boardHeight) + (currentY + pY)] = 4;
-						// add row to list
-						horizontalLines.add(currentY + pY);
+						assets.board[((currentY + pY) * assets.boardWidth) + pX] = 4;
 					}
+					// add row to list
+					horizontalLines.add(currentY + pY);
 				}
 			}
 		}
@@ -282,21 +312,26 @@ public class GameLoop implements KeyListener {
 		for (int i : horizontalLines) {
 			for (int pX = 1; pX < assets.boardWidth - 1; pX++) {
 				for (int pY = i; pY > 0; pY--) {
-					assets.board[(pX * assets.boardHeight) + pY] = assets.board[(pX * assets.boardHeight)
-							+ (assets.boardHeight - pY - 1)];
-					assets.board[pX] = 0;
+					assets.board[(pY * assets.boardWidth) + pX] = assets.board[((pY - 1) * assets.boardWidth) + pX];
+					// assets.board[pX] = 0;
 				}
+			}
+		}
+		// add 100 per line to score -- for 4 consecutive lines, add 1000
+		if (!horizontalLines.isEmpty()) {
+			if (horizontalLines.size() % 4 == 0) {
+				score += (horizontalLines.size() / 4) * 1000;
+			} else {
+				score += horizontalLines.size() * 100;
 			}
 		}
 		horizontalLines.clear();
 	}
 
-	@Override
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
+	// ===================USER INPUT==============================//
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
 		switch (e.getKeyCode()) {
@@ -324,6 +359,12 @@ public class GameLoop implements KeyListener {
 			System.exit(0);
 			break;
 		}
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
 
 	}

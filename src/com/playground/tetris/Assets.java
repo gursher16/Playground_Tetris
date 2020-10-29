@@ -21,10 +21,10 @@ public class Assets {
 			for (int x = 0; x < boardWidth; x++) {
 				if ((x == 0 || x == boardWidth - 1) || (y == boardHeight - 1)) {
 					// represents the boundary of the board
-					board[x * boardHeight + y] = 1;
+					board[y * boardWidth + x] = 1;
 				} else {
 					// represents the playing space of the board
-					board[x * boardHeight + y] = 0;
+					board[y * boardWidth + x] = 0;
 				}
 			}
 		}

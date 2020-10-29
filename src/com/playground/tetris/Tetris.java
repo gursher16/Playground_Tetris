@@ -1,27 +1,49 @@
 package com.playground.tetris;
 
 import java.awt.event.KeyListener;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import javax.swing.JFrame;
 
+/**
+ * Class that sets up the game environment and starts the game
+ * 
+ * @author Gursher
+ *
+ */
 public class Tetris {
 
 	public static void main(String args[]) {
 
-		System.out.println("Welcome to Tetris!");
-		System.out.println("Press Enter to continue..");
-		Scanner in = new Scanner(System.in);
-		in.nextLine();
-		Assets assets = new Assets();
-		GameLoop gameLoop = new GameLoop(assets);
-		createEnvironmentForKeyListener(gameLoop);
-
-		// assets.displayAllPieces();
-
 		try {
+			int difficulty = 0;
+			boolean isValid = false;
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+			System.out.println(
+					"===Welcome to Tetris!===\n" + "Select Difficulty:\n" + "1. Easy\n" + "2. Medium\n" + "3. Hard\n");
+
+			while (!isValid) {
+				try {
+					difficulty = Integer.parseInt(br.readLine());
+					isValid = (difficulty <= 3 && difficulty > 0);
+					if (!isValid) {
+						System.out.println("Incorrect Choice!\n" + "Please choose again");
+					}
+				} catch (NumberFormatException ex) {
+					System.out.println("Incorrect Choice!\n" + "Please choose again");
+				}
+			}
+
+			System.out.println("Starting game..");
+			Thread.sleep(500);
+			Assets assets = new Assets();
+			GameLoop gameLoop = new GameLoop(assets, difficulty);
+			createEnvironmentForKeyListener(gameLoop);
 			gameLoop.startGame();
-		} catch (InterruptedException e) {
+
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.exit(-1);
