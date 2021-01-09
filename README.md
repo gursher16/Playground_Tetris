@@ -1,7 +1,7 @@
 ### Playground_Tetris
 
-A simple, console based tetris game.  
-Inspired by javidx9 (https://www.youtube.com/channel/UC-yuWVUplUJZvieEligKBkA) a.k.a OneLoneCoder a.k.a The Bob Ross of programming. The main motive of this small project was to practice arrays. 
+A simple console based tetris game.  
+Inspired by javidx9 (https://www.youtube.com/channel/UC-yuWVUplUJZvieEligKBkA) a.k.a OneLoneCoder. The main motive of this small project was to practice arrays. 
 
 To compile, simply navigate to the *src/com/playground/tetris* folder using the command line interface and enter the following command:
 ```
